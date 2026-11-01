@@ -1,0 +1,50 @@
+[
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "e13373f838ab34027c5a80e16a6cb8262d41eab7",
+    "file": "src/flask/sessions.py",
+    "bug_line": 319,
+    "case_type": "wrong_logic",
+    "difficulty": "hard",
+    "bug_description": "SECRET_KEY_FALLBACKS ke keys ka order ulta: current key list mein pehle hai, jabki itsdangerous ko purani keys pehle aur current key sabse aakhir mein chahiye.",
+    "fixed_in": "fb541598",
+    "reviewer_result_v1": "missed (1 false alarm: KeyError at line 322)"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "e1aedecdc689cc9a79131851dbdabf6c3bc49c9e",
+    "file": "src/flask/testing.py",
+    "bug_line": 166,
+    "case_type": "wrong_logic",
+    "difficulty": "hard",
+    "bug_description": "ctx.request.host.partition(':')[0] IPv6 host (jaise [::1]:8000) ko galat jagah se tod deta hai, isliye session transaction mein cookies galat hostname par jaati hain.",
+    "fixed_in": "de8429ff",
+    "reviewer_result_v1": "missed (0 findings)"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "e93704fbfd5f40e48f8fe9034b6b0fe420d28fb3",
+    "file": "src/flask/blueprints.py",
+    "bug_line": 348,
+    "case_type": "missing_logic",
+    "difficulty": "hard",
+    "bug_description": "Nested blueprints ke liye url_prefix handle hua, par parent ka subdomain child blueprint ko pass karne ka logic is code mein hai hi nahi, isliye nested blueprint galat subdomain par register hota hai.",
+    "fixed_in": "d7b6c1f6",
+    "reviewer_result_v1": "missed (0 findings in clean eval run)"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "9c02f07f9bb4c88207c2a6860742c452c35d2948",
+    "file": "src/flask/__init__.py",
+    "bug_line": 80,
+    "case_type": "wrong_logic",
+    "difficulty": "easy",
+    "bug_description": "Copy-paste ki galti: __getattr__ mein dusra check bhi 'if name == \"escape\"' likha gaya, jabki wo 'Markup' hona chahiye tha. Isse 'from flask import Markup' kaam nahi karta.",
+    "fixed_in": "0ec9192c",
+        "reviewer_result_v1": "CAUGHT (line 80, correct explanation, 0 false alarms)"
+  }
+]

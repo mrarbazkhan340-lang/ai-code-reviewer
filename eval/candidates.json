@@ -1,0 +1,134 @@
+[
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "3b31df81aeccb889810b4b49ce6e608e67ebeeea",
+    "file": "flask/app.py",
+    "bug_line": 713,
+    "fixed_in": "e82db2ca",
+    "fix_message": "fix provide_automatic_options override",
+    "intro_message": "View functions can opt out of the default OPTIONS implementation",
+    "intro_size": "3 files, 36 lines"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "d7b6c1f6703df405c69da45e7e0ba3d1aed512ce",
+    "file": "src/flask/blueprints.py",
+    "bug_line": 461,
+    "fixed_in": "cabda593",
+    "fix_message": "Ensure that blueprint subdomains suffix-chain",
+    "intro_message": "Fix subdomain inheritance for nested blueprints.",
+    "intro_size": "2 files, 56 lines"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "ef95998d79eed3b8350d8db825e3d98f25c179f2",
+    "file": "src/flask/app.py",
+    "bug_line": 693,
+    "fixed_in": "a6a7a573",
+    "fix_message": "fix default value of app.env",
+    "intro_message": "deprecate FLASK_ENV",
+    "intro_size": "5 files, 191 lines"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "d597db67ded68d4aedf42b9d1d4570573fb79cd6",
+    "file": "src/flask/ctx.py",
+    "bug_line": 218,
+    "fixed_in": "095651be",
+    "fix_message": "fix has_app_context and has_request_context",
+    "intro_message": "contexts no longer use LocalStack",
+    "intro_size": "5 files, 217 lines"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "22987b68173e9bf56cc450cb7aeb93f5480a2660",
+    "file": "src/flask/sessions.py",
+    "bug_line": 362,
+    "fixed_in": "b707bf44",
+    "fix_message": "Preserve HttpOnly flag when deleting session cookie",
+    "intro_message": "include samesite and secure when removing session cookie (#3726)",
+    "intro_size": "3 files, 23 lines"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "086348e2f2874fb701048d5e1390cfe674de1f70",
+    "file": "flask/ctx.py",
+    "bug_line": 55,
+    "fixed_in": "633449a3",
+    "fix_message": "fix error message",
+    "intro_message": "Added after_this_request decorator.",
+    "intro_size": "6 files, 53 lines"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "141fde1d8ec8663b4be98777750d2f58c6fe44ad",
+    "file": "src/flask/blueprints.py",
+    "bug_line": 101,
+    "fixed_in": "3257b757",
+    "fix_message": "Fix blueprint renaming",
+    "intro_message": "Bugfix blueprint naming",
+    "intro_size": "3 files, 85 lines"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "6fbdeb80c76b8a698ab366d21ccd786731b17361",
+    "file": "src/flask/blueprints.py",
+    "bug_line": 357,
+    "fixed_in": "99afbb27",
+    "fix_message": "Fix blueprint nested url_prefix",
+    "intro_message": "Fix nested blueprint url_prefix",
+    "intro_size": "2 files, 16 lines"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "00f5a3e55ca3b6dd4e98044ab76f055dc74997ac",
+    "file": "src/flask/app.py",
+    "bug_line": 5,
+    "fixed_in": "6d5ccdef",
+    "fix_message": "Bugfix iscoroutinefunction with Python3.7",
+    "intro_message": "Alter ensure_sync implementation to support extensions",
+    "intro_size": "5 files, 201 lines"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "a4f0f197962b27a002c45f5e27b13a8d4a27ee63",
+    "file": "flask/json/__init__.py",
+    "bug_line": 223,
+    "fixed_in": "aff21fd8",
+    "fix_message": "Document parameter description error",
+    "intro_message": "don't push app context for test client json",
+    "intro_size": "4 files, 134 lines"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "c9ef500c5c2bbc7cfcb51e8b599e00248d290fd4",
+    "file": "flask/wrappers.py",
+    "bug_line": 208,
+    "fixed_in": "1c6dc154",
+    "fix_message": "fix response bases order",
+    "intro_message": "Mixin for JSON decoding code shared between request/response",
+    "intro_size": "1 files, 218 lines"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "e6178fe489b7828acc2bb8fd4b56a70b11ab6c6a",
+    "file": "src/flask/helpers.py",
+    "bug_line": 1004,
+    "fixed_in": "7ba35c4d",
+    "fix_message": "Restore support for using pathlib.Path for static_folder.",
+    "intro_message": "Handle different sep across os",
+    "intro_size": "1 files, 4 lines"
+  }
+]

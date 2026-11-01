@@ -1,0 +1,125 @@
+[
+  {
+    "case": 1,
+    "failed_steps": 0,
+    "near_bug": [
+      {
+        "file": "src/flask/sessions.py",
+        "line": 315,
+        "type": "error_handling",
+        "severity": "medium",
+        "message": "Accessing app.config['SECRET_KEY_FALLBACKS'] directly can raise a KeyError if the configuration key is not defined in app.config.",
+        "suggestion": "Use app.config.get('SECRET_KEY_FALLBACKS') instead of direct dictionary lookup to safely handle missing configuration keys."
+      }
+    ],
+    "others": [],
+    "verdict": "JUDGE_MANUALLY"
+  },
+  {
+    "case": 2,
+    "failed_steps": 0,
+    "near_bug": [],
+    "others": [],
+    "verdict": "JUDGE_MANUALLY"
+  },
+  {
+    "case": 3,
+    "failed_steps": 0,
+    "near_bug": [],
+    "others": [],
+    "verdict": "JUDGE_MANUALLY"
+  },
+  {
+    "case": 4,
+    "failed_steps": 0,
+    "near_bug": [
+      {
+        "file": "src/flask/__init__.py",
+        "line": 80,
+        "type": "bug",
+        "severity": "high",
+        "message": "The condition checks for 'name == \"escape\"' a second time instead of 'name == \"Markup\"', making the Markup deprecation block unreachable via attribute access.",
+        "suggestion": "Change the second 'if name == \"escape\":' to 'if name == \"Markup\":'."
+      }
+    ],
+    "others": [],
+    "verdict": "JUDGE_MANUALLY"
+  },
+  {
+    "case": 5,
+    "failed_steps": 0,
+    "near_bug": [],
+    "others": [],
+    "verdict": "JUDGE_MANUALLY"
+  },
+  {
+    "case": 6,
+    "failed_steps": 0,
+    "near_bug": [],
+    "others": [
+      {
+        "file": "src/flask/helpers.py",
+        "line": 29,
+        "type": "missing_test",
+        "severity": "medium",
+        "message": "New deprecation warning in get_env() and fallback logic in get_debug_flag() have been added without corresponding test cases in this diff.",
+        "suggestion": "Add unit tests to verify that DeprecationWarning is raised for get_env() and that FLASK_ENV fallback logic works as expected."
+      }
+    ],
+    "verdict": "JUDGE_MANUALLY"
+  },
+  {
+    "case": 7,
+    "failed_steps": 0,
+    "near_bug": [],
+    "others": [],
+    "verdict": "JUDGE_MANUALLY"
+  },
+  {
+    "case": 8,
+    "failed_steps": 0,
+    "near_bug": [],
+    "others": [
+      {
+        "file": "src/flask/blueprints.py",
+        "line": 266,
+        "type": "missing_test",
+        "severity": "medium",
+        "message": "The blueprint registration logic was modified to handle 'name_prefix' and duplicate check using 'name', but no corresponding tests are included in the diff.",
+        "suggestion": "Add unit tests to verify registering blueprints with 'name_prefix' and checking for name collisions correctly."
+      },
+      {
+        "file": "src/flask/blueprints.py",
+        "line": 280,
+        "type": "bug",
+        "severity": "medium",
+        "message": "In the ValueError exception message for name collisions, it references '{self.name}' and '{app.blueprints[self.name]}', but the collision check is actually performed against the computed 'name' (which includes the prefix) and 'app.blueprints[name]'.",
+        "suggestion": "Update the error message to reference 'name' and 'app.blueprints[name]' instead of 'self.name' and 'app.blueprints[self.name]'."
+      }
+    ],
+    "verdict": "JUDGE_MANUALLY"
+  },
+  {
+    "case": 9,
+    "failed_steps": 1,
+    "near_bug": [],
+    "others": [],
+    "verdict": "JUDGE_MANUALLY"
+  },
+  {
+    "case": 10,
+    "failed_steps": 0,
+    "near_bug": [
+      {
+        "file": "src/flask/helpers.py",
+        "line": 1000,
+        "type": "missing_test",
+        "severity": "medium",
+        "message": "A new normalization check using rstrip('/\\\\') was added to the static_folder setter without a corresponding unit test to verify its behavior for various slash combinations.",
+        "suggestion": "Add unit tests covering static_folder assignments with trailing forward slashes, backward slashes, and mixed slashes."
+      }
+    ],
+    "others": [],
+    "verdict": "JUDGE_MANUALLY"
+  }
+]

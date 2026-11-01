@@ -1,0 +1,197 @@
+
+=== Case 1/10: src/flask/sessions.py (bug line 319) ===
+Bug: SECRET_KEY_FALLBACKS ke keys ka order ulta: current key list mein pehle hai, jabki itsdangerous ko purani keys pehle aur current key sabse aakhir mein chahiye.
+
+Bug ke paas (1):
+  line 315 [error_handling/medium] Accessing app.config['SECRET_KEY_FALLBACKS'] directly can raise a KeyError if the configuration key is not defined in app.config.
+Baaki findings (0):
+
+=== Case 2/10: src/flask/testing.py (bug line 166) ===
+Bug: ctx.request.host.partition(':')[0] IPv6 host (jaise [::1]:8000) ko galat jagah se tod deta hai, isliye session transaction mein cookies galat hostname par jaati hain.
+
+Bug ke paas (0):
+Baaki findings (0):
+
+=== Case 3/10: src/flask/blueprints.py (bug line 348) ===
+Bug: Nested blueprints ke liye url_prefix handle hua, par parent ka subdomain child blueprint ko pass karne ka logic is code mein hai hi nahi, isliye nested blueprint galat subdomain par register hota hai.
+
+Bug ke paas (0):
+Baaki findings (0):
+
+=== Case 4/10: src/flask/__init__.py (bug line 80) ===
+Bug: Copy-paste ki galti: __getattr__ mein dusra check bhi 'if name == "escape"' likha gaya, jabki wo 'Markup' hona chahiye tha. Isse 'from flask import Markup' kaam nahi karta.
+
+Bug ke paas (1):
+  line 80 [bug/high] The condition checks for 'name == "escape"' a second time instead of 'name == "Markup"', making the Markup deprecation block unreachable via attribute access.
+Baaki findings (0):
+
+=== Case 5/10: flask/app.py (bug line 713) ===
+Bug: Fix commit e82db2ca: fix provide_automatic_options override
+--- Asli fix ka diff (reference) ---
+diff --git a/src/flask/sansio/app.py b/src/flask/sansio/app.py
+index e069b908..a734793e 100644
+--- a/src/flask/sansio/app.py
++++ b/src/flask/sansio/app.py
+@@ -628,6 +628,4 @@ class App(Scaffold):
+         required_methods: set[str] = set(getattr(view_func, "required_methods", ()))
+ 
+-        # starting with Flask 0.8 the view_func object can disable and
+-        # force-enable the automatic options handling.
+         if provide_automatic_options is None:
+             provide_automatic_options = getattr(
+@@ -635,10 +633,12 @@ class App(Scaffold):
+             )
+ 
+-        if provide_automatic_options is None:
+-            if "OPTIONS" not in methods and self.config["PROVIDE_AUTOMATIC_OPTIONS"]:
+-                provide_automatic_options = True
+-                required_methods.add("OPTIONS")
+-            else:
+-                provide_automatic_options = False
++            if provide_automatic_options is None:
++                provide_automatic_options = (
++                    "OPTIONS" not in methods
++                    and self.config["PROVIDE_AUTOMATIC_OPTIONS"]
++                )
++
++        if provide_automatic_options:
++            required_methods.add("OPTIONS")
+ 
+         # 
+--- end fix diff ---
+
+Bug ke paas (0):
+Baaki findings (0):
+
+=== Case 6/10: src/flask/app.py (bug line 693) ===
+Bug: Fix commit a6a7a573: fix default value of app.env
+--- Asli fix ka diff (reference) ---
+diff --git a/src/flask/app.py b/src/flask/app.py
+index 965865f2..db442c9e 100644
+--- a/src/flask/app.py
++++ b/src/flask/app.py
+@@ -828,5 +828,5 @@ class Flask(Scaffold):
+             root_path = self.instance_path
+         defaults = dict(self.default_config)
+-        defaults["ENV"] = os.environ.get("FLASK_ENV") or "development"
++        defaults["ENV"] = os.environ.get("FLASK_ENV") or "production"
+         defaults["DEBUG"] = get_debug_flag()
+         return self.config_class(root_path, defaults)
+
+--- end fix diff ---
+
+Bug ke paas (0):
+Baaki findings (1):
+  src/flask/helpers.py:29 [missing_test/medium] New deprecation warning in get_env() and fallback logic in get_debug_flag() have been added without corresponding test cases in this diff.
+
+=== Case 7/10: src/flask/sessions.py (bug line 362) ===
+Bug: Fix commit b707bf44: Preserve HttpOnly flag when deleting session cookie
+--- Asli fix ka diff (reference) ---
+diff --git a/src/flask/sessions.py b/src/flask/sessions.py
+index 20648dea..4e19270e 100644
+--- a/src/flask/sessions.py
++++ b/src/flask/sessions.py
+@@ -384,4 +384,5 @@ class SecureCookieSessionInterface(SessionInterface):
+         secure = self.get_cookie_secure(app)
+         samesite = self.get_cookie_samesite(app)
++        httponly = self.get_cookie_httponly(app)
+ 
+         # If the session is modified to be empty, remove the cookie.
+@@ -390,5 +391,10 @@ class SecureCookieSessionInterface(SessionInterface):
+             if session.modified:
+                 response.delete_cookie(
+-                    name, domain=domain, path=path, secure=secure, samesite=samesite
++                    name,
++                    domain=domain,
++                    path=path,
++                    secure=secure,
++                    samesite=samesite,
++                    httponly=httponly,
+                 )
+ 
+@@ -402,5 +408,4 @@ class SecureCookieSessionInterface(SessionInterface):
+             return
+ 
+-        httponly = self.get_cookie_httponly(app)
+         expires = self.get_expiration_time(app, session)
+         val = self.get_signing_serializer(app).dumps(dict(session))  # type: ignore
+
+--- end fix diff ---
+
+Bug ke paas (0):
+Baaki findings (0):
+
+=== Case 8/10: src/flask/blueprints.py (bug line 101) ===
+Bug: Fix commit 3257b757: Fix blueprint renaming
+--- Asli fix ka diff (reference) ---
+diff --git a/src/flask/blueprints.py b/src/flask/blueprints.py
+index 2da4d12b..f3913b30 100644
+--- a/src/flask/blueprints.py
++++ b/src/flask/blueprints.py
+@@ -68,4 +68,5 @@ class BlueprintSetupState:
+         self.url_prefix = url_prefix
+ 
++        self.name = self.options.get("name", blueprint.name)
+         self.name_prefix = self.options.get("name_prefix", "")
+ 
+@@ -97,7 +98,8 @@ class BlueprintSetupState:
+         if "defaults" in options:
+             defaults = dict(defaults, **options.pop("defaults"))
++
+         self.app.add_url_rule(
+             rule,
+-            f"{self.name_prefix}.{self.blueprint.name}.{endpoint}".lstrip("."),
++            f"{self.name_prefix}.{self.name}.{endpoint}".lstrip("."),
+             view_func,
+             defaults=defaults,
+
+--- end fix diff ---
+
+Bug ke paas (0):
+Baaki findings (2):
+  src/flask/blueprints.py:266 [missing_test/medium] The blueprint registration logic was modified to handle 'name_prefix' and duplicate check using 'name', but no corresponding tests are included in the diff.
+  src/flask/blueprints.py:280 [bug/medium] In the ValueError exception message for name collisions, it references '{self.name}' and '{app.blueprints[self.name]}', but the collision check is actually performed against the computed 'name' (which includes the prefix) and 'app.blueprints[name]'.
+
+=== Case 9/10: src/flask/blueprints.py (bug line 357) ===
+Bug: Fix commit 99afbb27: Fix blueprint nested url_prefix
+--- Asli fix ka diff (reference) ---
+diff --git a/src/flask/blueprints.py b/src/flask/blueprints.py
+index 88883ba7..85870a90 100644
+--- a/src/flask/blueprints.py
++++ b/src/flask/blueprints.py
+@@ -355,5 +355,7 @@ class Blueprint(Scaffold):
+                     state.url_prefix.rstrip("/") + "/" + bp_url_prefix.lstrip("/")
+                 )
+-            else:
++            elif bp_url_prefix is not None:
++                bp_options["url_prefix"] = bp_url_prefix
++            elif state.url_prefix is not None:
+                 bp_options["url_prefix"] = state.url_prefix
+ 
+
+--- end fix diff ---
+WARNING: 1 step(s) fail hue, is case ka result bharosemand nahi hai.
+
+Bug ke paas (0):
+Baaki findings (0):
+
+=== Case 10/10: src/flask/helpers.py (bug line 1004) ===
+Bug: Fix commit 7ba35c4d: Restore support for using pathlib.Path for static_folder.
+--- Asli fix ka diff (reference) ---
+diff --git a/src/flask/helpers.py b/src/flask/helpers.py
+index 42c9e0dc..786e096d 100644
+--- a/src/flask/helpers.py
++++ b/src/flask/helpers.py
+@@ -981,5 +981,5 @@ class _PackageBoundObject:
+     def static_folder(self, value):
+         if value is not None:
+-            value = value.rstrip("/\\")
++            value = os.fspath(value).rstrip(r"\/")
+         self._static_folder = value
+ 
+
+--- end fix diff ---
+
+Bug ke paas (1):
+  line 1000 [missing_test/medium] A new normalization check using rstrip('/\\') was added to the static_folder setter without a corresponding unit test to verify its behavior for various slash combinations.
+Baaki findings (0):

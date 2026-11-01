@@ -45,6 +45,84 @@
     "difficulty": "easy",
     "bug_description": "Copy-paste ki galti: __getattr__ mein dusra check bhi 'if name == \"escape\"' likha gaya, jabki wo 'Markup' hona chahiye tha. Isse 'from flask import Markup' kaam nahi karta.",
     "fixed_in": "0ec9192c",
-        "reviewer_result_v1": "CAUGHT (line 80, correct explanation, 0 false alarms)"
+    "reviewer_result_v1": "CAUGHT (line 80, correct explanation, 0 false alarms)"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "3b31df81aeccb889810b4b49ce6e608e67ebeeea",
+    "file": "flask/app.py",
+    "bug_line": 713,
+    "case_type": "auto",
+    "difficulty": "unknown",
+    "bug_description": "Fix commit e82db2ca: fix provide_automatic_options override",
+    "fixed_in": "e82db2ca",
+    "fix_diff": "diff --git a/src/flask/sansio/app.py b/src/flask/sansio/app.py\nindex e069b908..a734793e 100644\n--- a/src/flask/sansio/app.py\n+++ b/src/flask/sansio/app.py\n@@ -628,6 +628,4 @@ class App(Scaffold):\n         required_methods: set[str] = set(getattr(view_func, \"required_methods\", ()))\n \n-        # starting with Flask 0.8 the view_func object can disable and\n-        # force-enable the automatic options handling.\n         if provide_automatic_options is None:\n             provide_automatic_options = getattr(\n@@ -635,10 +633,12 @@ class App(Scaffold):\n             )\n \n-        if provide_automatic_options is None:\n-            if \"OPTIONS\" not in methods and self.config[\"PROVIDE_AUTOMATIC_OPTIONS\"]:\n-                provide_automatic_options = True\n-                required_methods.add(\"OPTIONS\")\n-            else:\n-                provide_automatic_options = False\n+            if provide_automatic_options is None:\n+                provide_automatic_options = (\n+                    \"OPTIONS\" not in methods\n+                    and self.config[\"PROVIDE_AUTOMATIC_OPTIONS\"]\n+                )\n+\n+        if provide_automatic_options:\n+            required_methods.add(\"OPTIONS\")\n \n         # Add the required methods now.\n",
+    "reviewer_result_v1": "not run yet"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "ef95998d79eed3b8350d8db825e3d98f25c179f2",
+    "file": "src/flask/app.py",
+    "bug_line": 693,
+    "case_type": "auto",
+    "difficulty": "unknown",
+    "bug_description": "Fix commit a6a7a573: fix default value of app.env",
+    "fixed_in": "a6a7a573",
+    "fix_diff": "diff --git a/src/flask/app.py b/src/flask/app.py\nindex 965865f2..db442c9e 100644\n--- a/src/flask/app.py\n+++ b/src/flask/app.py\n@@ -828,5 +828,5 @@ class Flask(Scaffold):\n             root_path = self.instance_path\n         defaults = dict(self.default_config)\n-        defaults[\"ENV\"] = os.environ.get(\"FLASK_ENV\") or \"development\"\n+        defaults[\"ENV\"] = os.environ.get(\"FLASK_ENV\") or \"production\"\n         defaults[\"DEBUG\"] = get_debug_flag()\n         return self.config_class(root_path, defaults)\n",
+    "reviewer_result_v1": "not run yet"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "22987b68173e9bf56cc450cb7aeb93f5480a2660",
+    "file": "src/flask/sessions.py",
+    "bug_line": 362,
+    "case_type": "auto",
+    "difficulty": "unknown",
+    "bug_description": "Fix commit b707bf44: Preserve HttpOnly flag when deleting session cookie",
+    "fixed_in": "b707bf44",
+    "fix_diff": "diff --git a/src/flask/sessions.py b/src/flask/sessions.py\nindex 20648dea..4e19270e 100644\n--- a/src/flask/sessions.py\n+++ b/src/flask/sessions.py\n@@ -384,4 +384,5 @@ class SecureCookieSessionInterface(SessionInterface):\n         secure = self.get_cookie_secure(app)\n         samesite = self.get_cookie_samesite(app)\n+        httponly = self.get_cookie_httponly(app)\n \n         # If the session is modified to be empty, remove the cookie.\n@@ -390,5 +391,10 @@ class SecureCookieSessionInterface(SessionInterface):\n             if session.modified:\n                 response.delete_cookie(\n-                    name, domain=domain, path=path, secure=secure, samesite=samesite\n+                    name,\n+                    domain=domain,\n+                    path=path,\n+                    secure=secure,\n+                    samesite=samesite,\n+                    httponly=httponly,\n                 )\n \n@@ -402,5 +408,4 @@ class SecureCookieSessionInterface(SessionInterface):\n             return\n \n-        httponly = self.get_cookie_httponly(app)\n         expires = self.get_expiration_time(app, session)\n         val = self.get_signing_serializer(app).dumps(dict(session))  # type: ignore\n",
+    "reviewer_result_v1": "not run yet"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "141fde1d8ec8663b4be98777750d2f58c6fe44ad",
+    "file": "src/flask/blueprints.py",
+    "bug_line": 101,
+    "case_type": "auto",
+    "difficulty": "unknown",
+    "bug_description": "Fix commit 3257b757: Fix blueprint renaming",
+    "fixed_in": "3257b757",
+    "fix_diff": "diff --git a/src/flask/blueprints.py b/src/flask/blueprints.py\nindex 2da4d12b..f3913b30 100644\n--- a/src/flask/blueprints.py\n+++ b/src/flask/blueprints.py\n@@ -68,4 +68,5 @@ class BlueprintSetupState:\n         self.url_prefix = url_prefix\n \n+        self.name = self.options.get(\"name\", blueprint.name)\n         self.name_prefix = self.options.get(\"name_prefix\", \"\")\n \n@@ -97,7 +98,8 @@ class BlueprintSetupState:\n         if \"defaults\" in options:\n             defaults = dict(defaults, **options.pop(\"defaults\"))\n+\n         self.app.add_url_rule(\n             rule,\n-            f\"{self.name_prefix}.{self.blueprint.name}.{endpoint}\".lstrip(\".\"),\n+            f\"{self.name_prefix}.{self.name}.{endpoint}\".lstrip(\".\"),\n             view_func,\n             defaults=defaults,\n",
+    "reviewer_result_v1": "not run yet"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "6fbdeb80c76b8a698ab366d21ccd786731b17361",
+    "file": "src/flask/blueprints.py",
+    "bug_line": 357,
+    "case_type": "auto",
+    "difficulty": "unknown",
+    "bug_description": "Fix commit 99afbb27: Fix blueprint nested url_prefix",
+    "fixed_in": "99afbb27",
+    "fix_diff": "diff --git a/src/flask/blueprints.py b/src/flask/blueprints.py\nindex 88883ba7..85870a90 100644\n--- a/src/flask/blueprints.py\n+++ b/src/flask/blueprints.py\n@@ -355,5 +355,7 @@ class Blueprint(Scaffold):\n                     state.url_prefix.rstrip(\"/\") + \"/\" + bp_url_prefix.lstrip(\"/\")\n                 )\n-            else:\n+            elif bp_url_prefix is not None:\n+                bp_options[\"url_prefix\"] = bp_url_prefix\n+            elif state.url_prefix is not None:\n                 bp_options[\"url_prefix\"] = state.url_prefix\n \n",
+    "reviewer_result_v1": "not run yet"
+  },
+  {
+    "owner": "pallets",
+    "repo": "flask",
+    "intro_sha": "e6178fe489b7828acc2bb8fd4b56a70b11ab6c6a",
+    "file": "src/flask/helpers.py",
+    "bug_line": 1004,
+    "case_type": "auto",
+    "difficulty": "unknown",
+    "bug_description": "Fix commit 7ba35c4d: Restore support for using pathlib.Path for static_folder.",
+    "fixed_in": "7ba35c4d",
+    "fix_diff": "diff --git a/src/flask/helpers.py b/src/flask/helpers.py\nindex 42c9e0dc..786e096d 100644\n--- a/src/flask/helpers.py\n+++ b/src/flask/helpers.py\n@@ -981,5 +981,5 @@ class _PackageBoundObject:\n     def static_folder(self, value):\n         if value is not None:\n-            value = value.rstrip(\"/\\\\\")\n+            value = os.fspath(value).rstrip(r\"\\/\")\n         self._static_folder = value\n \n",
+    "reviewer_result_v1": "not run yet"
   }
 ]
